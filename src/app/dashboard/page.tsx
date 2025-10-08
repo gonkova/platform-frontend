@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
@@ -10,10 +11,22 @@ export default function DashboardPage() {
 
   // Различни бутони според ролята
   const getRoleButtons = () => {
+    // Общ бутон за всички роли
+    const commonButton = (
+      <DashboardCard
+        title="AI Инструменти"
+        description="Преглед и управление на AI инструменти"
+        icon="🤖"
+        color="indigo"
+        href="/ai-tools"
+      />
+    );
+
     switch (user.role.name) {
       case "owner":
         return (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {commonButton}
             <DashboardCard
               title="Управление на потребители"
               description="Добавяне и редактиране на потребители"
@@ -48,13 +61,14 @@ export default function DashboardPage() {
               title="Отчети"
               description="Генериране на отчети"
               icon="📄"
-              color="indigo"
+              color="blue"
             />
           </div>
         );
       case "frontend":
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {commonButton}
             <DashboardCard
               title="Моите задачи"
               description="Преглед на възложени frontend задачи"
@@ -84,6 +98,7 @@ export default function DashboardPage() {
       case "backend":
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {commonButton}
             <DashboardCard
               title="API задачи"
               description="Разработка на API endpoints"
@@ -178,11 +193,13 @@ function DashboardCard({
   description,
   icon,
   color,
+  href,
 }: {
   title: string;
   description: string;
   icon: string;
   color: string;
+  href?: string;
 }) {
   const colorClasses = {
     blue: "from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700",
@@ -198,15 +215,21 @@ function DashboardCard({
       "from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700",
   };
 
-  return (
-    <button
+  const Card = (
+    <div
       className={`bg-gradient-to-br ${
         colorClasses[color as keyof typeof colorClasses]
-      } text-white rounded-xl p-6 text-left transition-all duration-200 hover:shadow-lg hover:scale-105`}
+      } text-white rounded-xl p-6 text-left transition-all duration-200 hover:shadow-lg hover:scale-105 cursor-pointer`}
     >
       <div className="text-4xl mb-3">{icon}</div>
       <h4 className="font-bold text-lg mb-2">{title}</h4>
       <p className="text-sm text-white/90">{description}</p>
-    </button>
+    </div>
   );
+
+  if (href) {
+    return <Link href={href}>{Card}</Link>;
+  }
+
+  return <button type="button">{Card}</button>;
 }
