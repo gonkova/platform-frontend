@@ -1,11 +1,10 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import Link from "next/link";
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   if (!user) return null;
 
@@ -61,7 +60,7 @@ export default function DashboardPage() {
               title="Отчети"
               description="Генериране на отчети"
               icon="📄"
-              color="blue"
+              color="indigo"
             />
           </div>
         );
@@ -131,59 +130,27 @@ export default function DashboardPage() {
   };
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">
-                    {user.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {user.role.display_name}
-                  </p>
-                </div>
-                <button
-                  onClick={logout}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-                >
-                  Изход
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Welcome Card */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-8 text-white mb-8">
-            <h2 className="text-3xl font-bold mb-2">
-              Добре дошъл, {user.name}! 👋
-            </h2>
-            <p className="text-blue-100 text-lg">
-              Ти си с роля:{" "}
-              <span className="font-semibold">{user.role.display_name}</span>
-            </p>
-            <p className="text-blue-100 mt-2">{user.role.description}</p>
-          </div>
-
-          {/* Role-based buttons */}
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">
-              Бързи действия
-            </h3>
-            {getRoleButtons()}
-          </div>
-        </main>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Welcome Card */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-8 text-white mb-8">
+        <h2 className="text-3xl font-bold mb-2">
+          Добре дошъл, {user.name}! 👋
+        </h2>
+        <p className="text-blue-100 text-lg">
+          Ти си с роля:{" "}
+          <span className="font-semibold">{user.role.display_name}</span>
+        </p>
+        <p className="text-blue-100 mt-2">{user.role.description}</p>
       </div>
-    </ProtectedRoute>
+
+      {/* Role-based buttons */}
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          Бързи действия
+        </h3>
+        {getRoleButtons()}
+      </div>
+    </div>
   );
 }
 

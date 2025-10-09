@@ -1,10 +1,11 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 
-export default function ProtectedRoute({
+export default function AuthenticatedLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -33,5 +34,5 @@ export default function ProtectedRoute({
     return null;
   }
 
-  return <>{children}</>;
+  return <DashboardLayout>{children}</DashboardLayout>;
 }
