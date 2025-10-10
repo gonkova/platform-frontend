@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
 
@@ -28,7 +29,7 @@ export default function Header({
   const navItems: NavItem[] = [
     { name: "Dashboard", href: "/dashboard", icon: "🏠" },
     { name: "AI Инструменти", href: "/ai-tools", icon: "🤖" },
-    { name: "Управление", href: "/admin", icon: "⚙️", roles: ["owner"] },
+    { name: "Управление", href: "/admin/tools", icon: "⚙️", roles: ["owner"] },
     { name: "Профил", href: "/profile", icon: "👤" },
   ];
 
@@ -46,7 +47,14 @@ export default function Header({
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/dashboard" className="flex items-center space-x-2">
-              <span className="text-2xl">🚀</span>
+              <Image
+                src="/logo.png"
+                alt="AI Platform"
+                width={50}
+                height={50}
+                className="rounded-xl"
+              />
+
               <span className="text-xl font-bold text-gray-900 hidden sm:block">
                 AI Platform
               </span>
