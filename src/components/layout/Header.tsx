@@ -30,6 +30,12 @@ export default function Header({
     { name: "Dashboard", href: "/dashboard", icon: "🏠" },
     { name: "AI Инструменти", href: "/ai-tools", icon: "🤖" },
     { name: "Управление", href: "/admin/tools", icon: "⚙️", roles: ["owner"] },
+    {
+      name: "Activity Log",
+      href: "/admin/activities",
+      icon: "📊",
+      roles: ["owner"],
+    }, // ДОБАВЕНА ЛИНИЯ
     { name: "Профил", href: "/profile", icon: "👤" },
   ];
 

@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -152,6 +153,41 @@ export default function ProfilePage() {
                   Сигурност
                 </h3>
                 <div className="space-y-4">
+                  {/* 2FA Security */}
+                  <Link href="/profile/security">
+                    <div className="flex justify-between items-center p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition cursor-pointer">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                          <span className="text-xl">🔐</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            Двуфакторно удостоверяване (2FA)
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {user.two_factor_enabled
+                              ? "✓ Активна - Допълнителна защита на акаунта"
+                              : "Препоръчваме активиране за по-висока сигурност"}
+                          </p>
+                        </div>
+                      </div>
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  </Link>
+
+                  {/* Change Password */}
                   <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
                     <div>
                       <p className="font-medium text-gray-900">Парола</p>

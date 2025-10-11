@@ -3,13 +3,18 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import TwoFactorPrompt from "@/components/TwoFactorPrompt";
+import api from "@/lib/api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login, user } = useAuth();
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [tempToken, setTempToken] = useState("");
+  const [twoFactorError, setTwoFactorError] = useState("");
+  const { setUser, setToken, user } = useAuth();
   const router = useRouter();
 
   // Ако вече си логнат, пренасочи към dashboard
@@ -24,12 +29,54 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      const response = await api.post("/login", { email, password });
+
+      // Провери дали изисква 2FA
+      if (response.data.requires_2fa) {
+        setTempToken(response.data.temp_token);
+        setRequires2FA(true);
+        setLoading(false);
+        return;
+      }
+
+      // Ако няма 2FA, директен login
+      localStorage.setItem("token", response.data.token);
+      setToken(response.data.token);
+      setUser(response.data.user);
+      router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Грешен имейл или парола");
-    } finally {
+      setError(err.response?.data?.message || "Грешен имейл или парола");
       setLoading(false);
     }
+  };
+
+  const handleVerify2FA = async (code: string) => {
+    setTwoFactorError("");
+    setLoading(true);
+
+    try {
+      // Задай временния токен в api instance
+      const originalToken = localStorage.getItem("token");
+      localStorage.setItem("token", tempToken);
+
+      const response = await api.post("/verify-2fa", { code });
+
+      // Запази финалния токен
+      localStorage.setItem("token", response.data.token);
+      setToken(response.data.token);
+      setUser(response.data.user);
+      router.push("/dashboard");
+    } catch (err: any) {
+      setTwoFactorError(err.response?.data?.message || "Невалиден код");
+      setLoading(false);
+    }
+  };
+
+  const handleCancel2FA = () => {
+    setRequires2FA(false);
+    setTempToken("");
+    setTwoFactorError("");
+    setLoading(false);
   };
 
   return (
@@ -124,6 +171,16 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* 2FA Prompt Modal */}
+      {requires2FA && (
+        <TwoFactorPrompt
+          onVerify={handleVerify2FA}
+          onCancel={handleCancel2FA}
+          loading={loading}
+          error={twoFactorError}
+        />
+      )}
     </div>
   );
 }

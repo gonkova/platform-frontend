@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import api from "@/lib/api";
-import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
 interface Role {
@@ -16,14 +15,18 @@ interface User {
   name: string;
   email: string;
   role: Role;
+  two_factor_enabled?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
+  token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  setUser: (user: User | null) => void;
+  setToken: (token: string | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,12 +35,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   const checkAuth = async () => {
-    const token = Cookies.get("auth_token");
-    if (!token) {
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) {
       setLoading(false);
       return;
     }
@@ -45,9 +49,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const response = await api.get("/me");
       setUser(response.data.user);
+      setToken(storedToken);
     } catch (error) {
-      Cookies.remove("auth_token");
+      localStorage.removeItem("token");
       setUser(null);
+      setToken(null);
     } finally {
       setLoading(false);
     }
@@ -56,12 +62,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (email: string, password: string) => {
     try {
       const response = await api.post("/login", { email, password });
-      const { user, token } = response.data;
 
-      Cookies.set("auth_token", token, { expires: 7 });
-      setUser(user);
+      // Провери дали изисква 2FA
+      if (response.data.requires_2fa) {
+        // Login page ще handle 2FA flow
+        throw {
+          requires_2fa: true,
+          temp_token: response.data.temp_token,
+        };
+      }
+
+      // Ако няма 2FA, директен login
+      const { user: userData, token: userToken } = response.data;
+
+      localStorage.setItem("token", userToken);
+      setToken(userToken);
+      setUser(userData);
       router.push("/dashboard");
     } catch (error: any) {
+      // Ако е 2FA error, пробвай го нагоре
+      if (error.requires_2fa) {
+        throw error;
+      }
       throw new Error(error.response?.data?.message || "Грешка при вход");
     }
   };
@@ -72,8 +94,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      Cookies.remove("auth_token");
+      localStorage.removeItem("token");
       setUser(null);
+      setToken(null);
       router.push("/login");
     }
   };
@@ -83,7 +106,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, checkAuth }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        login,
+        logout,
+        checkAuth,
+        setUser,
+        setToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
