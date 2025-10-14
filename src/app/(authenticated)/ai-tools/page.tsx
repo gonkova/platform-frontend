@@ -484,12 +484,13 @@ export default function AiToolsPage() {
                         >
                           Отвори
                         </a>
-                        <Link
+                        {/* TODO: Добави страница за редактиране */}
+                        {/* <Link
                           href={`/ai-tools/${tool.id}/edit`}
                           className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm"
                         >
                           Редактирай
-                        </Link>
+                        </Link> */}
                         {user?.role.name === "owner" && (
                           <button
                             onClick={() => handleDelete(tool.id, tool.name)}

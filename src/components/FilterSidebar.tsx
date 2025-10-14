@@ -84,15 +84,15 @@ export default function FilterSidebar({
   const difficulties = [
     {
       value: "beginner",
-      label: "Beginner",
+      label: "Начинаещ",
       color: "bg-green-100 text-green-800",
     },
     {
       value: "intermediate",
-      label: "Intermediate",
+      label: "Среден",
       color: "bg-yellow-100 text-yellow-800",
     },
-    { value: "advanced", label: "Advanced", color: "bg-red-100 text-red-800" },
+    { value: "advanced", label: "Напреднал", color: "bg-red-100 text-red-800" },
   ];
 
   const hasActiveFilters =

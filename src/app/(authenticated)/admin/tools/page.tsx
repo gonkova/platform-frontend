@@ -70,9 +70,15 @@ export default function AdminToolsPage() {
   };
 
   const handleReject = async (id: number) => {
+    const reason = prompt("Моля, въведете причина за отказ:");
+    if (!reason || reason.trim() === "") {
+      alert("Причината е задължителна!");
+      return;
+    }
+
     try {
       setActionLoading(id);
-      await api.post(`/admin/tools/${id}/reject`);
+      await api.post(`/admin/tools/${id}/reject`, { reason });
       await fetchTools();
     } catch (error) {
       console.error("Error rejecting tool:", error);

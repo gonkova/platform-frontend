@@ -67,7 +67,14 @@ export default function CreateAiToolPage() {
 
     try {
       await api.post("/ai-tools", {
-        ...formData,
+        name: formData.name,
+        description: formData.description,
+        url: formData.url,
+        documentation_url: formData.documentation_url,
+        video_url: formData.video_url,
+        difficulty_level: formData.difficulty_level,
+        categories: formData.category_ids,  // изпраща се като 'categories'
+        roles: formData.role_ids,            // изпраща се като 'roles'
         price: formData.is_free ? null : parseFloat(formData.price) || null,
       });
 
